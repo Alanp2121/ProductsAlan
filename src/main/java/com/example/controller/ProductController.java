@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.dto.ProductRequest;
 import com.example.dto.ProductResponse;
 import com.example.model.Product;
@@ -34,7 +33,6 @@ public class ProductController {
         this.service=service;
 
     }
-
 
     @GetMapping
     public ResponseEntity<List<ProductResponse>> fidnAll() {
@@ -61,7 +59,10 @@ public class ProductController {
     }
     @PutMapping("/{id}")
     public  ResponseEntity<ProductResponse> update(@PathVariable Long id,@Valid  @RequestBody ProductRequest productUpdate) {
-        Optional<Product> product= service.update(id, toEntity(productUpdate));
+        Optional<Product> product= service.update(id,
+             toEntity(productUpdate),
+             productUpdate.categoryId()
+            );
         if(product.isPresent()){
             return ResponseEntity.ok(toResponse(product.get()));
         }
