@@ -3,6 +3,8 @@ package com.example.service;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+
+import com.example.exception.OutOfStockException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.Category;
 import com.example.model.Product;
@@ -36,10 +38,7 @@ public class ProductService {
         return repo.save(product);
     }
 
-    public Optional<Product> update(Long id, Product newProduct, Long categoryId){
-       
-       
-       
+    public Product update(Long id, Product newProduct, Long categoryId){
         Product productBd= repo.findById(id).orElseThrow(
             ()->
             new ResourceNotFoundException("Product not found"+
@@ -58,7 +57,7 @@ public class ProductService {
         productBd.setStock(newProduct.getStock());
         productBd.setCategory(category);
 
-        return Optional.of(repo.save(productBd));
+        return repo.save(productBd);
     }
     public boolean delete(Long id){
         if(!repo.existsById(id)){
@@ -66,6 +65,20 @@ public class ProductService {
         }
         repo.deleteById(id);
         return true;
+    }
+    public Product applyDiscount(Long id, Double porcentaje) {
+        Product product = repo.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
+        );
+
+        if (product.getStock() <= 0) {
+            throw new OutOfStockException("No se puede aplicar un descuento a un producto con stock 0.");
+        }
+
+        double discountFactor = 1 - (porcentaje / 100.0);
+        product.setPrice(product.getPrice() * discountFactor);
+
+        return repo.save(product);
     }
 
 }
