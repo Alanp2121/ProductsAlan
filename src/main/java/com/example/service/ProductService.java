@@ -66,6 +66,7 @@ public class ProductService {
         repo.deleteById(id);
         return true;
     }
+    
     public Product applyDiscount(Long id, Double porcentaje) {
         Product product = repo.findById(id).orElseThrow(
             () -> new ResourceNotFoundException("Producto no encontrado con id: " + id)
